@@ -1,0 +1,415 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" />
+    <meta charset="utf-8">
+    <title>Vfsglobal Get Code</title>
+    <style type="text/css">
+        <!--
+        body {
+            color: #000000;
+            margin: 0;
+        }
+
+        .flex-container {
+            margin-left: 10px;
+            margin-right: 10px;
+            display: flex;
+            flex-direction: row;
+        }
+
+        @media (max-width: 800px) {
+            .flex-container {
+                flex-direction: column;
+            }
+        }
+
+        .flex-item {
+            max-width: 400px;
+            margin: 1em;
+        }
+
+        div.flex-item div:not(:first-of-type) {
+            margin-top: 5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+        }
+
+        div.box {
+            inline-size: 380px;
+            overflow-wrap: break-word;
+        }
+
+        option.hidden {
+            display: none;
+        }
+
+        .telegram {
+            margin-left: 10px;
+            margin-right: 10px;
+            vertical-align: center;
+
+        }
+        -->
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"
+        integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script src="https://smtpjs.com/v3/smtp.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/node-forge@1.0.0/dist/forge.min.js"></script>
+</head>
+
+<body>
+    <div class="flex-container">
+        <div class="flex-item">
+            <form id="accessTokenForm" action="https://lift-api.vfsglobal.com/user/login" method="POST">
+                <fieldset>
+                    <legend>POST https://lift-api.vfsglobal.com/user/login</legend>
+                    <div>
+                        <label for="username">username:</label>
+                        <input type="text" id="username" name="username" value="proverka@gmail.com" />
+                    </div>
+                    <div>
+                        <label for="password">password:</label>
+                        <input type="text" id="password" name="password" value="" />
+                    </div>
+                    <div>
+                        <label for="missioncode">missioncode:</label>
+                        <input type="text" id="missioncode" name="missioncode" value="pol" />
+                    </div>
+                    <div>
+                        <label for="countrycode">countrycode:</label>
+                        <input type="text" id="countrycode" name="countrycode" value="blr">
+                    </div>
+                    <div>
+                        <label for="captcha_version">captcha_version:</label>
+                        <input type="text" id="captcha_version" name="captcha_version" value="v2">
+                    </div>
+                    <div>
+                        <label for="captcha_api_key">captcha_api_key:</label>
+                        <input type="text" id="captcha_api_key" name="captcha_api_key" value="">
+                    </div>
+                    <div>
+                        <hr />
+                        <button type="button" onclick="getToken()">Get Token</button>
+                    </div>
+                    <div class="box">
+                        <span id="accessTokenData"></span>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="flex-item">
+
+            <form id="appointmentSlotsForm" action="https://lift-api.vfsglobal.com/appointment/slots" method="GET">
+                <fieldset>
+                    <legend>GET https://lift-api.vfsglobal.com/appointment/slots</legend>
+
+                    <div>
+                        <label for="countryCode">countryCode:</label>
+                        <input type="text" id="countryCode" name="countryCode" value="blr">
+                    </div>
+                    <div>
+                        <label for="missionCode">missionCode:</label>
+                        <input type="text" id="missionCode" name="missionCode" value="pol" />
+                    </div>
+                    <div>
+                        <label for="centerCode">centerCode:</label>
+                        <select id="centerCode" name="centerCode" value="POL-MIN">
+                            <option value="MOG">Могилев</option>
+                            <option value="BRE">Брест</option>
+                            <option value="BAR">Барановичи</option>
+                            <option value="PGOM">Гомель</option>
+                            <option value="GROD">Гродно</option>
+                            <option value="LID">Лида</option>
+                            <option value="PIN">ПИНСК</option>
+                            <option value="POL-MIN" selected="selected">Минск</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="loginUser">loginUser:</label>
+                        <input type="text" id="loginUser" name="loginUser" value="proverka@gmail.com" />
+                    </div>
+                    <div>
+                        <label for="visaCategoryCode">visaCategoryCode:</label>
+                        <select id="visaCategoryCode" name="visaCategoryCode">
+                            <option value="ODV" data-center-code="MOG" class="hidden">Национальные: Other D-visa
+                            </option>
+                            <option value="PBHDV" data-center-code="MOG" class="hidden">Национальные: PBH visa</option>
+                            <option value="BCV" data-center-code="MOG" class="hidden">Шенген C: business</option>
+                            <option value="CCV" data-center-code="MOG" class="hidden">Шенген C: culture</option>
+                            <option value="VCV" data-center-code="MOG" class="hidden">Шенген C: visit</option>
+                            <option value="DDV" data-center-code="BRE" class="hidden">Национальные: Driver D-visa
+                            </option>
+                            <option value="KPDV" data-center-code="BRE" class="hidden">Национальные: Karta Polaka D-visa
+                            </option>
+                            <option value="ODV" data-center-code="BRE" class="hidden">Национальные: Other D-visa
+                            </option>
+                            <option value="PDV" data-center-code="BRE" class="hidden">Национальные: Postal D-visa
+                            </option>
+                            <option value="WDV" data-center-code="BRE" class="hidden">Национальные: Work D-visa</option>
+                            <option value="OCV" data-center-code="BRE" class="hidden">Schengen Visa C</option>
+                            <option value="OCV" data-center-code="BAR" class="hidden">Шенген C</option>
+                            <option value="DDV" data-center-code="BAR" class="hidden">Национальные: Driver D-visa
+                            </option>
+                            <option value="KPDV" data-center-code="BAR" class="hidden">Национальные: Karta Polaka D-visa
+                            </option>
+                            <option value="ODV" data-center-code="BAR" class="hidden">Национальные: Other D-visa
+                            </option>
+                            <option value="PDV" data-center-code="BAR" class="hidden">Национальные: Postal D-visa
+                            </option>
+                            <option value="WDV" data-center-code="BAR" class="hidden">Национальные: Work D-visa</option>
+                            <option value="BCV" data-center-code="PGOM" class="hidden">Шенген C: Business C</option>
+                            <option value="CCV" data-center-code="PGOM" class="hidden">Шенген C: culture</option>
+                            <option value="VCV" data-center-code="PGOM" class="hidden">Шенген C: visit</option>
+                            <option value="ODV" data-center-code="PGOM" class="hidden">Национальные: Other D-visa
+                            </option>
+                            <option value="PBHDV" data-center-code="PGOM" class="hidden">Национальные: PBH visa</option>
+                            <option value="OCV" data-center-code="GROD" class="hidden">Шенген C: Other C visa</option>
+                            <option value="TCV" data-center-code="GROD" class="hidden">Шенген C: Tourism C-visa</option>
+                            <option value="KPDV" data-center-code="GROD" class="hidden">Национальные: Karta Polaka
+                                D-visa</option>
+                            <option value="ODV" data-center-code="GROD" class="hidden">Национальные: Other D-visa
+                            </option>
+                            <option value="PDV" data-center-code="GROD" class="hidden">Национальные: Postal D-visa
+                            </option>
+                            <option value="WDV" data-center-code="GROD" class="hidden">Национальные: Work D-visa
+                            </option>
+                            <option value="OCV" data-center-code="LID" class="hidden">Шенген C: Other C visa</option>
+                            <option value="TCV" data-center-code="LID" class="hidden">Шенген C: Tourism C-visa</option>
+                            <option value="KPDV" data-center-code="LID" class="hidden">Национальные: Karta Polaka D-visa
+                            </option>
+                            <option value="ODV" data-center-code="LID" class="hidden">Национальные: Other D-visa
+                            </option>
+                            <option value="WDV" data-center-code="LID" class="hidden">Национальные: Work D-visa</option>
+                            <option value="DDV" data-center-code="PIN" class="hidden">Национальные: Driver D-visa
+                            </option>
+                            <option value="KPDV" data-center-code="PIN" class="hidden">Национальные: Karta Polaka D-visa
+                            </option>
+                            <option value="ODV" data-center-code="PIN" class="hidden">Национальные: Other D-visa
+                            </option>
+                            <option value="PDV" data-center-code="PIN" class="hidden">Национальные: Postal D-visa
+                            </option>
+                            <option value="WDV" data-center-code="PIN" class="hidden">Национальные: Work D-visa</option>
+                            <option value="OCV" data-center-code="PIN" class="hidden">Шенген C: Other C visa</option>
+                            <option value="ODV" data-center-code="POL-MIN">Национальные: Other D-visa</option>
+                            <option value="PBHDV" data-center-code="POL-MIN" selected="selected">Национальные: PBH visa
+                            </option>
+                            <option value="PDV" data-center-code="POL-MIN">Национальные: Postal D-visa</option>
+                            <option value="BCV" data-center-code="POL-MIN">Шенген C: Business C</option>
+                            <option value="CCV" data-center-code="POL-MIN">Шенген C: culture</option>
+                            <option value="VCV" data-center-code="POL-MIN">Шенген C: visit</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="languageCode">languageCode:</label>
+                        <input type="text" id="languageCode" name="languageCode" value="ru-RU">
+                    </div>
+                    <div>
+                        <label for="applicantsCount">applicantsCount:</label>
+                        <input type="text" id="applicantsCount" name="applicantsCount" value="1">
+                    </div>
+                    <div>
+                        <label for="days">days:</label>
+                        <input type="text" id="days" name="days" value="180">
+                    </div>
+                    <div>
+                        <label for="fromDate">fromDate:</label>
+                        <input type="text" id="fromDate" name="fromDate" value="26/05/2023">
+                    </div>
+                    <div>
+                        <label for="slotType">slotType:</label>
+                        <input type="text" id="slotType" name="slotType" value="2">
+                    </div>
+                    <div>
+                        <label for="toDate">toDate:</label>
+                        <input type="text" id="toDate" name="toDate" value="22/11/2023">
+                    </div>
+                    <div>
+                        <hr />
+                        <button type="button" onclick="pullAppointmentSlots(this, 0)">Pull Slots</button>
+                    </div>
+                    <div class="box">
+                        <span id="appointmentSlotsData"></span>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="flex-item">
+            <form id="sendEmailForm">
+                <fieldset>
+                    <legend>Email</legend>
+                    <div>
+                        <button type="button" onclick="sendEmail(getCurrentTimeString())">Send Email</button>
+                    </div>
+                    <div class="box">
+                        <span id="sendEmailData"></span>
+                    </div>
+                </fieldset>
+
+            </form>
+
+        </div>
+    </div>
+    <div class="telegram">
+        Join us:&nbsp;<a href="https://t.me/+qfkPflu4SAc5NjU6"><svg height="32px" width="32px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve">
+                <circle style="fill:#59AAE7;" cx="256" cy="256" r="256" />
+                <path style="fill:#3D9AE3;" d="M256,0c-11.317,0-22.461,0.744-33.391,2.167C348.216,18.53,445.217,125.933,445.217,256
+	s-97.002,237.47-222.609,253.833C233.539,511.256,244.683,512,256,512c141.385,0,256-114.616,256-256S397.385,0,256,0z" />
+                <path style="fill:#FCFCFC;" d="M164.689,311.141L82.127,269.86c-2.263-1.132-2.285-4.353-0.038-5.516L395.75,102.105
+	c2.304-1.192,4.964,0.811,4.456,3.355l-54.004,270.017c-0.385,1.927-2.446,3.011-4.253,2.237l-73.393-31.453
+	c-0.879-0.377-1.884-0.326-2.721,0.139l-94.839,52.688c-2.062,1.145-4.597-0.345-4.597-2.705v-82.474
+	C166.4,312.736,165.738,311.665,164.689,311.141z" />
+                <path style="fill:#D8D7DA;" d="M200.31,338.967l-0.513-82.428c-0.003-0.528,0.27-1.018,0.72-1.293l133.899-81.798
+	c1.518-0.927,3.106,1.083,1.852,2.345l-101.9,102.624c-0.112,0.114-0.207,0.244-0.278,0.387l-17.43,34.858l-13.509,25.988
+	C202.426,341.045,200.32,340.538,200.31,338.967z" />
+            </svg></a>
+    </div>
+    <script>
+        (function () {
+            const now = new Date();
+            const fromDate = new Date();
+            fromDate.setDate(now.getDate() + 1);
+            const toDate = new Date();
+            toDate.setDate(now.getDate() + 121);
+            $('#fromDate').val(formatDate(fromDate));
+            $('#toDate').val(formatDate(toDate));
+
+            $('#centerCode').change(function () {
+                const value = $('#centerCode').val();
+
+                $('#visaCategoryCode option').addClass('hidden');
+                const $options = $(`#visaCategoryCode option[data-center-code='${value}']`);
+                $options.removeClass('hidden');
+                $('#visaCategoryCode').val($options.first().attr('value'));
+            });
+        })();
+        function getToken() {
+            const $form = $('form#accessTokenForm');
+            const values = $form.serializeArray();
+            const Ne = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----' 
+                + 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCpigN3/5Ti/WJk51pbPQdpCe96\n  TPVoeMAk/cUlAPpYh8zGpr6zssbM11Je1SoQTiuipxIL+c0oGXti8vLzln3yfS+N\n  56wuSh0Hyt1Z+waSx6IDFlfzImEtq8m1osS32B83HRiFZbeKB8QIRJhZil1pJSzM\n  sg0Y0QmDyv1yR4FzIQIDAQAB'
+                + '-----END PUBLIC KEY-----');
+            const password = values.find(function(input) { 
+                return input.name == 'password';
+            });
+            password.value = window.btoa(Ne.encrypt(password.value));
+            const body = $.param(values);
+            
+            const xhr = new XMLHttpRequest();
+
+            const method = $form.attr('method');
+            const tokenUri = $form.attr('action');
+
+            xhr.open(method, tokenUri, false);
+
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            xhr.send(body);
+
+            $('#accessTokenData').html(xhr.response);
+
+            const token = JSON.parse(xhr.response);
+            $('#loginUser').val(token.loginUser);
+            window.token = token;
+
+            if (window.getTokenTimer) {
+                clearTimeout(window.getTokenTimer);
+            }
+            window.getTokenTimer = setTimeout(getToken, 60 * 60 * 1000);
+        }
+
+        function pullAppointmentSlots(btn, seconds) {
+            if (window.appointmentSlotsTimer) {
+                clearTimeout(window.appointmentSlotsTimer);
+            }
+            $(btn).text(`Auto Pull in ${seconds}s...`);
+            if (seconds > 0) {
+                window.appointmentSlotsTimer = setTimeout(pullAppointmentSlots, 1000, btn, seconds - 1)
+                return;
+            }
+            window.appointmentSlotsTimer = setTimeout(pullAppointmentSlots, 1000, btn, 6 * 60);
+            setTimeout(getAppointmentSlots, 100);
+        }
+
+        function getAppointmentSlots() {
+
+            const $form = $('form#appointmentSlotsForm');
+            const query = $form.serialize();
+
+            const xhr = new XMLHttpRequest();
+
+            const method = $form.attr('method');
+            const tokenUri = $form.attr('action');
+
+            let index = window.appointmentSlotsIndex || 0;
+            const requestUrl = new URL(`${tokenUri}?i=${++index}&${query}`);
+            window.appointmentSlotsIndex = index;
+            xhr.open(method, requestUrl, false);
+
+            const accessToken = token.accessToken;
+            xhr.setRequestHeader("Authorization", accessToken);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=utf-8");
+            xhr.setRequestHeader("Route", "blr/ru/pol");
+
+            xhr.send('');
+            $('#appointmentSlotsData').html(xhr.response);
+            const time = getCurrentTimeString();
+            var slots = JSON.parse(xhr.response);
+            if (Array.isArray(slots) && slots[0].error == null) {
+                sendEmail(time, slots.map(item => item.date));
+            }
+            console.log(`#${index} - ${time} - ${xhr.response}`);
+        }
+
+        function getCurrentTimeString() {
+            const now = new Date();
+            const timeString = formatTime(now);
+            return timeString;
+        }
+
+        function formatTime(date) {
+            const timeString = `${padStartZero(date.getHours())}:${padStartZero(date.getMinutes())}:${padStartZero(date.getSeconds())}`;
+            return timeString;
+        }
+
+        function formatDate(date) {
+            const dateString = `${padStartZero(date.getDate())}/${padStartZero(date.getMonth() + 1)}/${date.getFullYear()}`;
+            return dateString;
+        }
+
+        function padStartZero(value) {
+            return `${value}`.padStart(2, '0');
+        }
+
+        function sendEmail(time, dates) {
+
+            const centerCode = $('#centerCode option:selected').text().trim();
+            const visaCategoryCode = $('#visaCategoryCode option:selected').text().trim();
+            const subject = `Даты ${centerCode} - ${visaCategoryCode}`;
+            const message = dates ? `Доступны даты: ${dates.join(', ')}`  : 'Проверка';
+
+            const to = $('#username').val();
+            Email.send({
+                Host: "smtp.elasticemail.com",
+                Username: "pavel.lesovich@gmail.com",
+                Password: "934E2E8D1FFDDF19E3071A85955E8673DED9",
+                To: to,
+                From: "pavel.lesovich@gmail.com",
+                Subject: subject,
+                Body: `${time} -  ${message}`,
+            })
+                .then(function (message) {
+                    $('#sendEmailData').html(message);
+
+                });
+        }
+    </script>
+</body>
+
+</html>
