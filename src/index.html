@@ -316,7 +316,8 @@
                 window.appointmentSlotsTimer = setTimeout(pullAppointmentSlots, 1000, btn, seconds - 1)
                 return;
             }
-            window.appointmentSlotsTimer = setTimeout(pullAppointmentSlots, 1000, btn, 6 * 60);
+            const pullTimeoutSeconds = getPullTimeoutSeconds();
+            window.appointmentSlotsTimer = setTimeout(pullAppointmentSlots, 1000, btn, pullTimeoutSeconds);
             setTimeout(getAppointmentSlots, 100);
         }
 
@@ -403,6 +404,10 @@
             });
         }
 
+        function getPullTimeoutSeconds(){
+            return window.pullTimeoutSeconds || 6 * 60;
+        }
+
         (function () {
             const now = new Date();
             const fromDate = new Date();
@@ -425,6 +430,7 @@
             persistInput($('#password'));
             persistInput($('#centerCode'));
             persistInput($('#visaCategoryCode'));
+
             
         })();
     </script>
