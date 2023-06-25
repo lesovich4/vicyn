@@ -256,8 +256,9 @@
         </div>
     </div>
     <div class="telegram">
-        Join us:&nbsp;<a href="https://t.me/+qfkPflu4SAc5NjU6"><svg height="32px" width="32px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve">
+        Join us:&nbsp;<a href="https://t.me/+qfkPflu4SAc5NjU6"><svg height="32px" width="32px" version="1.1"
+                id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                viewBox="0 0 512 512" xml:space="preserve">
                 <circle style="fill:#59AAE7;" cx="256" cy="256" r="256" />
                 <path style="fill:#3D9AE3;" d="M256,0c-11.317,0-22.461,0.744-33.391,2.167C348.216,18.53,445.217,125.933,445.217,256
 	s-97.002,237.47-222.609,253.833C233.539,511.256,244.683,512,256,512c141.385,0,256-114.616,256-256S397.385,0,256,0z" />
@@ -271,36 +272,18 @@
             </svg></a>
     </div>
     <script>
-        (function () {
-            const now = new Date();
-            const fromDate = new Date();
-            fromDate.setDate(now.getDate() + 1);
-            const toDate = new Date();
-            toDate.setDate(now.getDate() + 121);
-            $('#fromDate').val(formatDate(fromDate));
-            $('#toDate').val(formatDate(toDate));
-
-            $('#centerCode').change(function () {
-                const value = $('#centerCode').val();
-
-                $('#visaCategoryCode option').addClass('hidden');
-                const $options = $(`#visaCategoryCode option[data-center-code='${value}']`);
-                $options.removeClass('hidden');
-                $('#visaCategoryCode').val($options.first().attr('value'));
-            });
-        })();
         function getToken() {
             const $form = $('form#accessTokenForm');
             const values = $form.serializeArray();
-            const Ne = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----' 
+            const Ne = forge.pki.publicKeyFromPem('-----BEGIN PUBLIC KEY-----'
                 + 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCpigN3/5Ti/WJk51pbPQdpCe96\n  TPVoeMAk/cUlAPpYh8zGpr6zssbM11Je1SoQTiuipxIL+c0oGXti8vLzln3yfS+N\n  56wuSh0Hyt1Z+waSx6IDFlfzImEtq8m1osS32B83HRiFZbeKB8QIRJhZil1pJSzM\n  sg0Y0QmDyv1yR4FzIQIDAQAB'
                 + '-----END PUBLIC KEY-----');
-            const password = values.find(function(input) { 
+            const password = values.find(function (input) {
                 return input.name == 'password';
             });
             password.value = window.btoa(Ne.encrypt(password.value));
             const body = $.param(values);
-            
+
             const xhr = new XMLHttpRequest();
 
             const method = $form.attr('method');
@@ -333,7 +316,7 @@
                 window.appointmentSlotsTimer = setTimeout(pullAppointmentSlots, 1000, btn, seconds - 1)
                 return;
             }
-            window.appointmentSlotsTimer = setTimeout(pullAppointmentSlots, 1000, btn, 6 * 60);
+            window.appointmentSlotsTimer = setTimeout(pullAppointmentSlots, 1000, btn, 1 * 60);
             setTimeout(getAppointmentSlots, 100);
         }
 
@@ -392,7 +375,7 @@
             const centerCode = $('#centerCode option:selected').text().trim();
             const visaCategoryCode = $('#visaCategoryCode option:selected').text().trim();
             const subject = `Даты ${centerCode} - ${visaCategoryCode}`;
-            const message = dates ? `Доступны даты: ${dates.join(', ')}`  : 'Проверка';
+            const message = dates ? `Доступны даты: ${dates.join(', ')}` : 'Проверка';
 
             const to = $('#username').val();
             Email.send({
@@ -406,9 +389,44 @@
             })
                 .then(function (message) {
                     $('#sendEmailData').html(message);
-
                 });
         }
+
+        function persistInput($input) {
+            var key = `input-${$input.attr('id')}`;
+            var storedValue = localStorage.getItem(key);
+            if (storedValue)
+                $input.val(storedValue);
+
+            $input.change(function () {
+                localStorage.setItem(key, $input.val());
+            });
+        }
+
+        (function () {
+            const now = new Date();
+            const fromDate = new Date();
+            fromDate.setDate(now.getDate() + 1);
+            const toDate = new Date();
+            toDate.setDate(now.getDate() + 121);
+            $('#fromDate').val(formatDate(fromDate));
+            $('#toDate').val(formatDate(toDate));
+
+            $('#centerCode').change(function () {
+                const value = $('#centerCode').val();
+
+                $('#visaCategoryCode option').addClass('hidden');
+                const $options = $(`#visaCategoryCode option[data-center-code='${value}']`);
+                $options.removeClass('hidden');
+                $('#visaCategoryCode').val($options.first().attr('value'));
+            });
+
+            persistInput($('#username'));
+            persistInput($('#password'));
+            persistInput($('#centerCode'));
+            persistInput($('#visaCategoryCode'));
+            
+        })();
     </script>
 </body>
 
