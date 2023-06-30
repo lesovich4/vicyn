@@ -59,7 +59,7 @@ countDown.addListener("accessTokenData.callback", (value) => {
 });
 
 function clickGetToken() {
-    setTimeout(getAppointmentSlots, 100);
+    setTimeout(getToken, 100);
     countDown.setup('accessTokenData', 60 * 60);
 }
 
