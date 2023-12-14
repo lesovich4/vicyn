@@ -38,6 +38,7 @@ export class AppointmentSlotsViewModel {
     selectedVisaCategory = ko.observable('');
     selectedVisaSubCategory = ko.observable('');
     enablePulling = ko.observable(false);
+    pullInterval = ko.observable('2');
     message = ko.observable('');
 
     workerClient: ReservationWorkerClient;
@@ -48,19 +49,23 @@ export class AppointmentSlotsViewModel {
         this.setup();
     }
 
+    private togglePulling() {
+        const enablePulling = this.enablePulling();
+        if (enablePulling) {
+            this.workerClient.startSlotCheking(+this.pullInterval() * 60);
+        }
+        else {
+            this.workerClient.stopSlotCheking();
+        }
+
+    }
     private async setup() {
 
         this.workerClient.observables.slotChekingUpdated.subscribe(response => {
             this.message(getMessage(response));
         });
-        this.enablePulling.subscribe(value => {
-            if (value) {
-                this.workerClient.startSlotCheking();
-            }
-            else {
-                this.workerClient.stopSlotCheking();
-            }
-        });
+        this.enablePulling.subscribe(() => this.togglePulling());
+        this.pullInterval.subscribe(() => this.togglePulling());
 
         visaCenterService
             .getCenters()

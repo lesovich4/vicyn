@@ -1,6 +1,6 @@
 import { publicIpv4 } from "public-ip";
 import { checkIsSlotAvailable, checkIsSlotAvailableResponse } from "../api/check-is-slot-available";
-import { getToken, getTokenResponse } from "../api/get-token";
+import { getToken } from "../api/get-token";
 import { allocation, applicantService } from "../services/appicant-service";
 import { authenticationService, AccessTokenLifetime } from "../services/authentication-service";
 import { CacheObj, CacheSource, cacheService } from "../services/cache-service";
@@ -8,7 +8,7 @@ import { visaCenterService } from "../services/visa-center-service";
 import { createApplicant, createApplicantResponse } from "../api/create-applicant";
 import { getSlots, getSlotsResponse } from "../api/get-slots";
 import { schedule, scheduleResponse } from "../api/schedule";
-
+ 
 let _cache: CacheObj = {};
 let _source: CacheSource = {
     set: (cache: CacheObj) => {
@@ -161,6 +161,7 @@ const methods = {
     },
 
     startPullingToken() {
+        console.log(`Pulling token with ${AccessTokenLifetime} seconds interval.`);
         countDownMap.getToken = new CountDown('getToken', 5, async () => {
             if (authenticationService.isAuthenticated() && !authenticationService.isExpiried) {
                 return;
@@ -186,8 +187,9 @@ const methods = {
         }
     },
 
-    startSlotCheking() {
-        countDownMap.slotCheking = new CountDown('slotCheking', 2 * 60, async () => {
+    startSlotCheking(pullInterval: number) {
+        console.log(`Pulling slots with ${pullInterval} seconds interval.`);
+        countDownMap.slotCheking = new CountDown('slotCheking', pullInterval, async () => {
 
             if (!authenticationService.isAuthenticated() || authenticationService.isExpiried) {
                 return;
@@ -197,7 +199,7 @@ const methods = {
             const visaCategoryCode = visaCenterService.selectedVisaSubCategory;
 
             if (!vacCode || !visaCategoryCode) {
-
+                return;
             }
 
             try {

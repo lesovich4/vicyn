@@ -64,10 +64,10 @@ export class ReservationWorkerClient {
         });
     }
 
-    startSlotCheking() {
+    startSlotCheking(pullInterval: number) {
         this.worker.postMessage({
             method: 'startSlotCheking',
-            methodArguments: []
+            methodArguments: [pullInterval]
         });
     }
 
