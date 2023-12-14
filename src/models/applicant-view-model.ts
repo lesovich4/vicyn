@@ -95,13 +95,13 @@ export class ApplicantViewModel {
 
     buttonText = ko.computed(() => {
         if (!this.urn()) {
-            return 'Create Applicant';
+            return 'Создать апликанта';
         }
         if (!this.allocation()) {
-            return 'Pick up Slot';
+            return 'Получить слот';
         }
 
-        return 'Schedule';
+        return 'Записать';
     });
     workerClient: ReservationWorkerClient;
 

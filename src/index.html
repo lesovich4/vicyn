@@ -12,29 +12,28 @@
         <div class="flex-item" data-bind="using: token">
             <form id="accessTokenForm" data-bind="submit: getToken">
                 <fieldset>
-                    <legend>Access Token</legend>
+                    <legend>Токен доступа</legend>
                     <div>
-                        <label for="username">username:</label>
+                        <label for="username">Имя пользователя:</label>
                         <input data-bind="value: username" type="text" id="username" name="username"
                             value="proverka@gmail.com" />
                     </div>
                     <div>
-                        <label for="password">password:</label>
+                        <label for="password">Пароль:</label>
                         <input data-bind="value: password" type="password" id="password" name="password" value="" />
                     </div>
                     <div>
-                        <label><input type="checkbox" id="enablePulling1" data-bind="checked: enablePulling" />Enable
-                            Pulling </label>
+                        <label><input type="checkbox" id="enablePulling1" data-bind="checked: enablePulling" />Включить автообновление</label>
 
                     </div>
                     <div class="box" data-bind="visible: accessToken">
                         <hr />
                         <p data-bind="text: accessToken" style="width: 100%;"></p>
-                        <button type="button" data-bind="click: removeAccessToken">Clear</button>
+                        <button type="button" data-bind="click: removeAccessToken">Очистить</button>
                     </div>
                     <div>
                         <hr />
-                        <button type="submit">Get Token</button>
+                        <button type="submit">Обновить</button>
                     </div>
                     <div class="box">
                         <p data-bind="html: message"></p>
@@ -46,22 +45,22 @@
 
             <form id="appointmentSlotsForm" data-bind="submit: checkSlots">
                 <fieldset>
-                    <legend>Where Check</legend>
+                    <legend>Проверка слотов</legend>
 
                     <div>
-                        <label for="centerCode">Center Code:</label>
+                        <label for="centerCode">ВЦ:</label>
                         <select id="centerCode" name="centerCode"
                             data-bind="options: centers, value: selectedCenter, optionsText: 'centerName', optionsValue: 'isoCode'">
                         </select>
                     </div>
                     <div>
-                        <label for="visaCategory">Visa Category:</label>
+                        <label for="visaCategory">Тип:</label>
                         <select id="visaCategory" name="visaCategory"
                             data-bind="options: visaCategories, value: selectedVisaCategory, optionsText: 'name', optionsValue: 'code'">
                         </select>
                     </div>
                     <div>
-                        <label for="visaSubCategory">Visa Sub Category:</label>
+                        <label for="visaSubCategory">Цель:</label>
                         <select id="visaSubCategory" name="visaCategory"
                             data-bind="options: visaSubCategories, value: selectedVisaSubCategory, optionsText: 'name', optionsValue: 'code'">
                         </select>
@@ -69,25 +68,24 @@
                     <div>
                         <p>
                             <label><input type="checkbox" id="enablePulling2"
-                                    data-bind="checked: enablePulling" />Enable
-                                Pulling </label>
+                                    data-bind="checked: enablePulling" />Включить автопроверку </label>
                         </p>
                         <p data-bind="visible: enablePulling">
 
-                            <label for="pullInterval">Pull interval:</label>
+                            <label for="pullInterval">Интервал проверки:</label>
                             <select id="pullInterval" name="pullInterval" data-bind="value: pullInterval">
-                                <option value="1">1 minute</option>
-                                <option value="2">2 minutes</option>
-                                <option value="3">3 minutes</option>
-                                <option value="5">5 minutes</option>
-                                <option value="8">8 minutes</option>
-                                <option value="13">13 minutes</option>
+                                <option value="1">1 минута</option>
+                                <option value="2">2 минуты</option>
+                                <option value="3">3 минуты</option>
+                                <option value="5">5 минут</option>
+                                <option value="8">8 минут</option>
+                                <option value="13">13 минут</option>
                             </select>
                         </p>
                     </div>
                     <div>
                         <hr />
-                        <button type="submit">Check Slots</button>
+                        <button type="submit">Проверить слоты</button>
                     </div>
                     <div class="box">
                         <p data-bind="html: message"></p>
@@ -98,68 +96,70 @@
         <div class="flex-item" data-bind="using: applicant">
             <form id="applicantForm" data-bind="submit: save">
                 <fieldset>
-                    <legend>Applicant</legend>
+                    <legend>Регистрация</legend>
+                    <div class="info">
+                        Регистрация возможна только для пенсионеров и детей
+                    </div>
                     <div>
-                        <label for="firstName">First Name:</label>
+                        <label for="firstName">Имя:</label>
                         <input data-bind="value: firstName" type="text" id="firstName" name="firstName"
                             placeholder="IVAN" />
                     </div>
                     <div>
-                        <label for="lastName">Last Name:</label>
+                        <label for="lastName">Фамилия:</label>
                         <input data-bind="value: lastName" type="text" id="lastName" name="lastName"
                             placeholder="BABICH" />
                     </div>
                     <div>
-                        <label for="sex">Sex:</label>
+                        <label for="sex">Пол:</label>
                         <select id="sex" name="sex" data-bind="value: sex">
-                            <option value="2">Female</option>
-                            <option value="1">Male</option>
-                            <option value="3">Others</option>
+                            <option value="2">Женский</option>
+                            <option value="1">Мужской</option>
+                            <option value="3">Средний</option>
                         </select>
                     </div>
                     <div>
-                        <label for="dateOfBirth">Date Of Birth:</label>
+                        <label for="dateOfBirth">Дата рождения:</label>
                         <input data-bind="value: dateOfBirth" type="text" id="dateOfBirth" name="dateOfBirth"
-                            placeholder="DD/MM/YYYY" />
+                            placeholder="ДД/ММ/ГГГГ" />
                     </div>
                     <div>
-                        <label for="passportNumber">Passport Number:</label>
+                        <label for="passportNumber">Серия и номер паспорта:</label>
                         <input data-bind="value: passportNumber" type="text" id="passportNumber" name="passportNumber"
                             placeholder="MP1234567" />
                     </div>
                     <div>
-                        <label for="passportExpiry">Passport Expiry:</label>
+                        <label for="passportExpiry">Срок действия паспорта:</label>
                         <input data-bind="value: passportExpiry" type="text" id="passportExpiry" name="passportExpiry"
-                            placeholder="DD/MM/YYYY" />
+                            placeholder="ДД/ММ/ГГГГ" />
                     </div>
                     <div>
-                        <label for="phoneCode">Phone Code:</label>
+                        <label for="phoneCode">Префикс телефона:</label>
                         <input data-bind="value: phoneCode" type="text" id="phoneCode" name="phoneCode"
                             placeholder="375" value="375" />
                     </div>
                     <div>
-                        <label for="phoneNumber">Phone Number:</label>
+                        <label for="phoneNumber">Номер телефона:</label>
                         <input data-bind="value: phoneNumber" type="text" id="phoneNumber" name="phoneNumber"
                             placeholder="291112233" />
                     </div>
                     <div>
-                        <label><input type="checkbox" id="autoSchedule" data-bind="checked: autoSchedule" />Auto
-                            Schedule</label>
+                        <label><input type="checkbox" id="autoSchedule" data-bind="checked: autoSchedule" />Включить авторегистрацию</label>
 
                     </div>
                     <div data-bind="visible: urn">
                         <hr />
                         <p data-bind="text: urn"></p>
-                        <button type="button" data-bind="click: removeUrn">Clear</button>
+                        <button type="button" data-bind="click: removeUrn">Почистить</button>
                     </div>
                     <div data-bind="visible: allocation">
                         <hr />
                         <p data-bind="text: allocation() && allocation().text"></p>
-                        <button type="button" data-bind="click: removeAllocation">Clear</button>
+                        <button type="button" data-bind="click: removeAllocation">Почистить</button>
                     </div>
                     <div>
                         <hr />
-                        <button type="submit" data-bind="text: buttonText">Next</button>
+                        <button type="submit" data-bind="text: buttonText">Далее</button>
                     </div>
                     <div class="box">
                         <p data-bind="html: message"></p>

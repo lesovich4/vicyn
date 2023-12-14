@@ -38,7 +38,7 @@ export class AppointmentSlotsViewModel {
     selectedVisaCategory = ko.observable('');
     selectedVisaSubCategory = ko.observable('');
     enablePulling = ko.observable(false);
-    pullInterval = ko.observable('2');
+    pullInterval = ko.observable('3');
     message = ko.observable('');
 
     workerClient: ReservationWorkerClient;
