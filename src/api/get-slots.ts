@@ -51,9 +51,7 @@ export async function getSlots(request: getSlotsRequest) {
     const tomorrow = new Date()
     tomorrow.setDate(now.getDate() + 1);
     const monthEnd = new Date();
-    monthEnd.setDate(1);
     monthEnd.setMonth(now.getMonth() + 1);
-    monthEnd.setDate(0);
     query.append('fromDate', formatDateDDMMYYYY(tomorrow));
     query.append('slotType', '2');
     query.append('toDate', formatDateDDMMYYYY(monthEnd));

@@ -13,7 +13,8 @@ export interface createApplicantRequest {
     passportExpiry: string;
     phoneCode: string;
     phoneNumber: string;
-    ipAddress: string
+    ipAddress: string;
+    emailId: string;
 }
 
 export interface applicant {
@@ -43,6 +44,8 @@ export async function createApplicant(request: createApplicantRequest) {
         , phoneCode
         , phoneNumber
         , ipAddress
+        , emailId
+
     } = request;
     const body = {
         centerCode,
@@ -71,7 +74,7 @@ export async function createApplicant(request: createApplicantRequest) {
                 confirmPassportNumber: '',
                 passportExpirtyDate: passportExpiry,
                 dateOfBirth,
-                emailId: authenticationService.username().toLocaleUpperCase(),
+                emailId: emailId ?? authenticationService.username().toLocaleUpperCase(),
                 employerEmailId: '',
                 nationalityCode: 'BLR',
                 state: null as string,

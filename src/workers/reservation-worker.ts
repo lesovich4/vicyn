@@ -64,6 +64,7 @@ class Sheduler {
                 passportExpiry: applicantService.passportExpiry,
                 phoneCode: applicantService.phoneCode,
                 phoneNumber: applicantService.phoneNumber,
+                emailId: applicantService.emailId,
                 centerCode: visaCenterService.selectedCenter,
                 visaCategoryCode: visaCenterService.selectedVisaSubCategory,
                 ipAddress

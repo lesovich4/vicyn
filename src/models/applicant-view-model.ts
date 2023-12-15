@@ -91,6 +91,7 @@ export class ApplicantViewModel {
     passportExpiry = ko.observable(applicantService.passportExpiry);
     phoneCode = ko.observable(applicantService.phoneCode);
     phoneNumber = ko.observable(applicantService.phoneNumber);
+    emailId = ko.observable(applicantService.emailId);
     autoSchedule = ko.observable(false);
 
     buttonText = ko.computed(() => {
@@ -116,6 +117,7 @@ export class ApplicantViewModel {
         this.passportExpiry.subscribe(passportExpiry => applicantService.passportExpiry = passportExpiry);
         this.phoneCode.subscribe(phoneCode => applicantService.phoneCode = phoneCode);
         this.phoneNumber.subscribe(phoneNumber => applicantService.phoneNumber = phoneNumber);
+        this.emailId.subscribe(emailId => applicantService.emailId = emailId);
         this.autoSchedule.subscribe(value => {
             if (value) {
                 this.workerClient.enableScheduler();
@@ -165,6 +167,7 @@ export class ApplicantViewModel {
                 passportExpiry: this.passportExpiry(),
                 phoneCode: this.phoneCode(),
                 phoneNumber: this.phoneNumber(),
+                emailId: this.emailId(),
                 centerCode: visaCenterService.selectedCenter,
                 visaCategoryCode: visaCenterService.selectedVisaSubCategory,
                 ipAddress

@@ -63,6 +63,13 @@ export const applicantService = {
         cacheService.setJson<string>('applicantService.phoneNumber', value);
     },
 
+    get emailId() {
+        return cacheService.getJson<string>('applicantService.emailId');
+    },
+    set emailId(value: string) {
+        cacheService.setJson<string>('applicantService.emailId', value);
+    },
+
     get urn() {
         return cacheService.getJson<string>('applicantService.urn');
     },
