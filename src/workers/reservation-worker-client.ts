@@ -92,6 +92,13 @@ export class ReservationWorkerClient {
         });
     }
 
+    schedule() {
+        this.worker.postMessage({
+            method: 'schedule',
+            methodArguments: []
+        });
+    }
+
     terminate() {
         this.worker.terminate();
     };

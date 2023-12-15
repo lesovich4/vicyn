@@ -122,6 +122,9 @@ export class AppointmentSlotsViewModel {
         try {
             const response = await checkIsSlotAvailable({ vacCode, visaCategoryCode });
             const data = await response.json() as checkIsSlotAvailableResponse;
+            if (data.earliestDate !== null) {
+                this.workerClient.schedule();
+            }
             this.message(getMessage(data));
         }
         catch {

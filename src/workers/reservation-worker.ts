@@ -232,6 +232,10 @@ const methods = {
     disableScheduler() {
         scheduler.enabled = false;
     },
+    
+    schedule() {
+        scheduler.process();
+    },
 };
 
 type Methods = keyof typeof methods;
