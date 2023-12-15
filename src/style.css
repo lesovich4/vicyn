@@ -56,3 +56,23 @@ option.hidden {
     background-color: #ddd;
     border-color: #aaa;
 }
+
+div.refreshable {
+    display: table;
+    width: 100%;
+}
+
+div.refreshable label {
+    display: table-row;
+}
+
+div.refreshable select {
+    width: 90%;
+    display: table-cell;
+
+}
+
+div.refreshable .refresh {
+    width: 10%;
+    display: table-cell;
+}

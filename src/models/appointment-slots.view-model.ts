@@ -67,50 +67,67 @@ export class AppointmentSlotsViewModel {
         this.enablePulling.subscribe(() => this.togglePulling());
         this.pullInterval.subscribe(() => this.togglePulling());
 
-        visaCenterService
-            .getCenters()
-            .then(centers => this.centers(centers));
-
-        await this.changeCenter(visaCenterService.selectedCenter);
+        await this.setupCenters();
+        await this.setupVisaCategories(visaCenterService.selectedCenter);
         this.selectedCenter(visaCenterService.selectedCenter);
-        await this.changeVisaCategory(visaCenterService.selectedCenter, visaCenterService.selectedVisaCategory);
+        await this.setupVisaSubCategories(visaCenterService.selectedCenter, visaCenterService.selectedVisaCategory);
         this.selectedVisaCategory(visaCenterService.selectedVisaCategory);
         this.selectedVisaSubCategory(visaCenterService.selectedVisaSubCategory);
 
         this.selectedCenter.subscribe(centerCode => {
             visaCenterService.selectedCenter = centerCode;
             const visaCategory: string = this.selectedVisaCategory();
-            this.changeCenter(centerCode);
-            this.changeVisaCategory(centerCode, visaCategory);
+            this.setupVisaCategories(centerCode);
+            this.setupVisaSubCategories(centerCode, visaCategory);
         });
         this.selectedVisaCategory.subscribe(visaCategory => {
             visaCenterService.selectedVisaCategory = visaCategory;
             const centerCode: string = this.selectedCenter();
-            this.changeVisaCategory(centerCode, visaCategory);
+            this.setupVisaSubCategories(centerCode, visaCategory);
         });
         this.selectedVisaSubCategory.subscribe(visaSubCategory => {
             visaCenterService.selectedVisaSubCategory = visaSubCategory;
         });
     }
 
-    async changeCenter(centerCode: string) {
+    async refreshCenters() {
+        await this.setupCenters(true);
+    }
+
+    async refreshVisaCategories() {
+        const centerCode: string = this.selectedCenter();
+        this.setupVisaCategories(centerCode, true);
+    }
+
+    async refreshVisaSubCategories() {
+        const centerCode: string = this.selectedCenter();
+        const visaCategory: string = this.selectedVisaCategory();
+        this.setupVisaSubCategories(centerCode, visaCategory, true);
+    }
+
+    async setupCenters(skipCache?: boolean) {
+        const centers = await visaCenterService.getCenters(skipCache);
+        this.centers(centers);
+    }
+
+    async setupVisaCategories(centerCode: string, skipCache?: boolean) {
 
         if (!centerCode) {
             return;
         }
 
-        const visaCategories = await visaCenterService.getVisaCategories(centerCode);
+        const visaCategories = await visaCenterService.getVisaCategories(centerCode, skipCache);
 
         this.visaCategories(visaCategories);
     }
 
-    async changeVisaCategory(centerCode: string, visaCategory: string) {
+    async setupVisaSubCategories(centerCode: string, visaCategory: string, skipCache?: boolean) {
 
         if (!centerCode || !visaCategory) {
             return;
         }
 
-        const visaSubCategories = await visaCenterService.getVisaSubCategories(centerCode, visaCategory);
+        const visaSubCategories = await visaCenterService.getVisaSubCategories(centerCode, visaCategory, skipCache);
 
         this.visaSubCategories(visaSubCategories);
     }
