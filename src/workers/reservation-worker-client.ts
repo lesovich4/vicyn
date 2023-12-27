@@ -23,7 +23,7 @@ export class ReservationWorkerClient {
         scheduleUpdated: ko.observable<scheduleResponse>(null),
     };
 
-    constructor(defaultListener: Function, onError: ((this: AbstractWorker, ev: ErrorEvent) => any) | null) {
+    constructor(defaultListener?: Function, onError?: ((this: AbstractWorker, ev: ErrorEvent) => any) | null) {
         this.defaultListener = defaultListener ?? (() => { });
         if (onError) {
             this.worker.onerror = onError;

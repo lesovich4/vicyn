@@ -1,6 +1,4 @@
-
 import { baseUrl } from './base-url';
-import { encryptPassword } from '../utils/encrypt-password';
 
 export interface getTokenRequest {
     username: string;

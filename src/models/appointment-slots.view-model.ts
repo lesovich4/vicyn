@@ -9,7 +9,7 @@ import { ReservationWorkerClient } from '../workers/reservation-worker-client';
 
 function getMessage(response: checkIsSlotAvailableResponse | null) {
 
-    const hasDates = response !== null && response.error === null;
+    const hasDates = response && !response.error;
 
     const messageBuilder = [];
 
@@ -23,7 +23,7 @@ function getMessage(response: checkIsSlotAvailableResponse | null) {
     if (hasDates) {
         messageBuilder.push(`EarliestDate: ${response.earliestDate}`);
     }
-    else if (response !== null) {
+    else if (response && response.error) {
         messageBuilder.push(`${response.error.code} - ${response.error.description}`);
     }
 
@@ -38,7 +38,7 @@ export class AppointmentSlotsViewModel {
     selectedVisaCategory = ko.observable('');
     selectedVisaSubCategory = ko.observable('');
     enablePulling = ko.observable(false);
-    pullInterval = ko.observable('3');
+    pullInterval = ko.observable('150');
     message = ko.observable('');
 
     workerClient: ReservationWorkerClient;
@@ -52,7 +52,7 @@ export class AppointmentSlotsViewModel {
     private togglePulling() {
         const enablePulling = this.enablePulling();
         if (enablePulling) {
-            this.workerClient.startSlotCheking(+this.pullInterval() * 60);
+            this.workerClient.startSlotCheking(+this.pullInterval());
         }
         else {
             this.workerClient.stopSlotCheking();

@@ -40,7 +40,7 @@ export class TokenViewModel {
 
         this.workerClient.observables.tokenUpdated.subscribe(response => {
             const { isAuthenticated, accessToken } = response;
-            this.updateState({ isAuthenticated, accessToken });
+            this.updateState({ isAuthenticated, accessToken }, false);
         });
 
         this.username.subscribe(authenticationService.username);
@@ -58,8 +58,6 @@ export class TokenViewModel {
                 this.workerClient.stopPullingTokens();
             }
         });
-        this.isAuthenticated.subscribe(authenticationService.isAuthenticated);
-        this.accessToken.subscribe(authenticationService.accessToken);
     }
 
     getToken() {
@@ -68,19 +66,23 @@ export class TokenViewModel {
         getToken({ encryptedPassword, username })
             .then(response => response.json() as Promise<getTokenResponse>)
             .then(token => {
-                this.updateState(token);
+                this.updateState(token, true);
             })
             .catch(_ => {
-                this.updateState({ isAuthenticated: false, accessToken: '' });
+                this.updateState({ isAuthenticated: false, accessToken: '' }, true);
             });
     }
 
     removeAccessToken() {
-        this.updateState({ isAuthenticated: false, accessToken: '' });
+        this.updateState({ isAuthenticated: false, accessToken: '' }, true);
     }
 
-    private updateState(state: { isAuthenticated: boolean; accessToken: string; }) {
+    private updateState(state: { isAuthenticated: boolean; accessToken: string; }, updateService: boolean) {
         const { isAuthenticated, accessToken } = state;
+        if (updateService) {
+            authenticationService.isAuthenticated(isAuthenticated);
+            authenticationService.accessToken(accessToken);
+        }
         this.isAuthenticated(isAuthenticated);
         this.accessToken(accessToken);
         this.message(getMessage());

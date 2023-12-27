@@ -2,82 +2,11 @@ import * as ko from 'knockout';
 import { createApplicant, createApplicantResponse } from '../api/create-applicant';
 import { visaCenterService } from '../services/visa-center-service';
 import { allocation, applicantService } from '../services/appicant-service';
-import { getCurrentTimeString } from '../utils/date-time';
-import { Failed, Ok } from '../utils/elements';
 import { getSlots, getSlotsResponse } from '../api/get-slots';
 import { schedule, scheduleResponse } from '../api/schedule';
 import { publicIpv4 } from 'public-ip';
 import { ReservationWorkerClient } from '../workers/reservation-worker-client';
-
-
-function getApplicantMessage(response: createApplicantResponse | null) {
-    const success = response !== null && response.error === null;
-
-    const messageBuilder = [];
-
-    const time = getCurrentTimeString();
-    messageBuilder.push(time);
-    messageBuilder.push('&nbsp;');
-
-    messageBuilder.push(success ? Ok : Failed);
-    messageBuilder.push('<hr/>');
-
-    if (success) {
-        messageBuilder.push(`URN: ${response.urn}`);
-    }
-    else if (response !== null) {
-        messageBuilder.push(`${response.error.code} - ${response.error.description}`);
-    }
-
-    return messageBuilder.join('');
-}
-
-function getSlotsMessage(response: getSlotsResponse[] | null) {
-    const success = response !== null && response.length > 0 && response[0].error === null;
-
-    const messageBuilder = [];
-
-    const time = getCurrentTimeString();
-    messageBuilder.push(time);
-    messageBuilder.push('&nbsp;');
-
-    messageBuilder.push(success ? Ok : Failed);
-    messageBuilder.push('<hr/>');
-
-    if (success) {
-        messageBuilder.push('Available Dates: ');
-        messageBuilder.push(response.map(item => item.date).join(', '));
-    }
-    else if (response !== null && response.length > 0 && response[0].error !== null) {
-        messageBuilder.push(`${response[0].error.code} - ${response[0].error.description}`);
-    }
-
-    return messageBuilder.join('');
-
-}
-
-function getScheduleMessage(response: scheduleResponse | null) {
-    const success = response !== null && response.IsAppointmentBooked;
-
-    const messageBuilder = [];
-
-    const time = getCurrentTimeString();
-    messageBuilder.push(time);
-    messageBuilder.push('&nbsp;');
-
-    messageBuilder.push(success ? Ok : Failed);
-    messageBuilder.push('<hr/>');
-
-    if (success) {
-        messageBuilder.push('Appointment Booked');
-    }
-    else if (response !== null && response.error) {
-        messageBuilder.push(`${response.error.code} - ${response.error.description}`);
-    }
-
-    return messageBuilder.join('');
-
-}
+import { getApplicantMessage, getSlotsMessage, getScheduleMessage } from './applicant-view-model.get-message';
 
 export class ApplicantViewModel {
     urn = ko.observable(applicantService.urn);
@@ -96,7 +25,7 @@ export class ApplicantViewModel {
 
     buttonText = ko.computed(() => {
         if (!this.urn()) {
-            return 'Создать апликанта';
+            return 'Создать заявителя';
         }
         if (!this.allocation()) {
             return 'Получить слот';
@@ -118,8 +47,8 @@ export class ApplicantViewModel {
         this.phoneCode.subscribe(phoneCode => applicantService.phoneCode = phoneCode);
         this.phoneNumber.subscribe(phoneNumber => applicantService.phoneNumber = phoneNumber);
         this.emailId.subscribe(emailId => applicantService.emailId = emailId);
-        this.autoSchedule.subscribe(value => {
-            if (value) {
+        this.autoSchedule.subscribe(autoSchedule => {
+            if (autoSchedule) {
                 this.workerClient.enableScheduler();
             } else {
                 this.workerClient.disableScheduler();
@@ -129,21 +58,15 @@ export class ApplicantViewModel {
         this.workerClient.observables.applicantCreated.subscribe(data => {
             if (data !== null) {
                 this.urn(data.urn);
-                this.message(getApplicantMessage(data));
             }
             else {
-                this.removeUrn();
-                this.message(getApplicantMessage(null));
+                this.urn(null);
             }
+            this.message(getApplicantMessage(data));
         });
 
         this.workerClient.observables.allocationUpdated.subscribe(allocation => {
-            if (allocation !== null) {
-                this.allocation(allocation);
-            }
-            else {
-                this.removeAllocation();
-            }
+            this.allocation(allocation);
         });
 
         this.workerClient.observables.getSlotsUpdated.subscribe(data => {
@@ -192,7 +115,6 @@ export class ApplicantViewModel {
             });
             const data = await response.json() as getSlotsResponse[];
 
-
             const allocations: allocation[] = [];
             data.forEach(item => {
                 if (!item.counters) {
@@ -226,6 +148,7 @@ export class ApplicantViewModel {
         }
 
     }
+
     async schedule() {
         try {
             const response = await schedule({
@@ -254,16 +177,17 @@ export class ApplicantViewModel {
         this.allocation(null);
     }
 
-
-    async save() {
+    async process() {
         if (!applicantService.urn) {
             await this.createApplicant();
+            return;
         }
-        else if (!applicantService.allocation) {
+
+        if (!applicantService.allocation) {
             await this.getSlots();
+            return;
         }
-        else {
-            await this.schedule();
-        }
+
+        await this.schedule();
     }
 }

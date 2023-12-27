@@ -8,6 +8,7 @@ import { visaCenterService } from "../services/visa-center-service";
 import { createApplicant, createApplicantResponse } from "../api/create-applicant";
 import { getSlots, getSlotsResponse } from "../api/get-slots";
 import { schedule, scheduleResponse } from "../api/schedule";
+import { CountDown } from "../utils/count-down";
  
 let _cache: CacheObj = {};
 let _source: CacheSource = {
@@ -19,27 +20,6 @@ let _source: CacheSource = {
 };
 cacheService.setupSource(_source);
 
-
-class CountDown {
-    name: string;
-    seconds: number;
-    callback: Function;
-    private value: number = 0;
-
-    constructor(name: string, seconds: number, callback: Function) {
-        this.name = name;
-        this.seconds = seconds;
-        this.callback = callback;
-    }
-
-    tick() {
-        if (this.value === 0) {
-            this.value = this.seconds;
-            this.callback();
-        }
-        this.value--;
-    };
-}
 
 var countDownMap: { [key: string]: CountDown } = {};
 
