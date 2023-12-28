@@ -15,6 +15,9 @@ export interface createApplicantRequest {
     phoneNumber: string;
     ipAddress: string;
     emailId: string;
+    nationalId?: string;
+    visaToken?: string;
+
 }
 
 export interface applicant {
@@ -45,6 +48,8 @@ export async function createApplicant(request: createApplicantRequest) {
         , phoneNumber
         , ipAddress
         , emailId
+        , nationalId
+        , visaToken : VisaToken
 
     } = request;
     const body = {
@@ -63,9 +68,9 @@ export async function createApplicant(request: createApplicantRequest) {
                 lastName,
                 employerLastName: '',
                 salutation: '',
-                gender: Number.parseInt(sex),
-                nationalId: null as string,
-                VisaToken: null as string,
+                gender: +sex,
+                nationalId,
+                VisaToken,
                 employerContactNumber: '',
                 contactNumber: phoneNumber,
                 dialCode: phoneCode,

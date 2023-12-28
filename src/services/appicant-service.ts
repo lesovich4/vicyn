@@ -1,6 +1,6 @@
 import { cacheService } from "./cache-service";
 
-export interface allocation{
+export interface allocation {
     id: number;
     text: string;
 }
@@ -83,4 +83,23 @@ export const applicantService = {
     set allocation(value: allocation) {
         cacheService.setJson('applicantService.allocation', value);
     },
+
+    get nationalId() {
+        return cacheService.getJson<string>('applicantService.nationalId');
+    },
+    set nationalId(value: string) {
+        cacheService.setJson('applicantService.nationalId', value);
+    },
+
+    get visaToken() {
+        return cacheService.getJson<string>('applicantService.visaToken');
+    },
+    set visaToken(value: string) {
+        cacheService.setJson('applicantService.visaToken', value);
+        cacheService.setJson('applicantService.visaTokenLastUpdated', new Date());
+    },
+
+    get visaTokenLastUpdated() {
+        return cacheService.getJson<Date>('applicantService.visaTokenLastUpdated');
+    }
 }

@@ -149,7 +149,7 @@
                     </div>
                     <div class="box">
                         <p data-bind="html: message"></p>
-                    </div> 
+                    </div>
                 </fieldset>
             </form>
         </div>
@@ -157,9 +157,6 @@
             <form id="applicantForm" data-bind="submit: process">
                 <fieldset>
                     <legend>Регистрация</legend>
-                    <div class="info">
-                        Регистрация возможна только для пенсионеров и детей
-                    </div>
                     <div>
                         <label for="firstName">Имя:</label>
                         <input data-bind="value: firstName" type="text" id="firstName" name="firstName"
@@ -175,13 +172,26 @@
                         <select id="sex" name="sex" data-bind="value: sex">
                             <option value="2">Женский</option>
                             <option value="1">Мужской</option>
-                            <option value="3">Средний</option>
+                            <option value="3">Другое</option>
                         </select>
                     </div>
                     <div>
                         <label for="dateOfBirth">Дата рождения:</label>
                         <input data-bind="value: dateOfBirth" type="text" id="dateOfBirth" name="dateOfBirth"
                             placeholder="ДД/ММ/ГГГГ" />
+                    </div>
+                    <div data-bind="visible: displayExtraFields">
+                        <div>
+                            <label for="nationalId">Личный номер:</label>
+                            <input data-bind="value: nationalId" type="text" id="nationalId" name="nationalId"
+                                placeholder="3010190A000PB0" />
+                        </div>
+                        <div>
+                            <label for="visaToken">Виза токен:</label>
+                            <input data-bind="value: visaToken" type="text" id="visaToken" name="visaToken"
+                                placeholder="XXXXXXXXXXXX" />
+                            <p data-bind="html: visaTokenMessage"></p>
+                        </div>
                     </div>
                     <div>
                         <label for="passportNumber">Серия и номер паспорта:</label>

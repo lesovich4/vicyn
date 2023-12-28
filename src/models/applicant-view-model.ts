@@ -1,4 +1,6 @@
 import * as ko from 'knockout';
+import * as moment from 'moment';
+import 'moment/locale/ru';
 import { createApplicant, createApplicantResponse } from '../api/create-applicant';
 import { visaCenterService } from '../services/visa-center-service';
 import { allocation, applicantService } from '../services/appicant-service';
@@ -8,11 +10,15 @@ import { publicIpv4 } from 'public-ip';
 import { ReservationWorkerClient } from '../workers/reservation-worker-client';
 import { getApplicantMessage, getSlotsMessage, getScheduleMessage } from './applicant-view-model.get-message';
 import { getRanges } from '../services/slots-utils';
+import { getErrorHtml, getInfoHtml } from '../utils/elements';
 
 export class ApplicantViewModel {
     urn = ko.observable(applicantService.urn);
     allocation = ko.observable(applicantService.allocation);
     message = ko.observable('');
+    visaTokenMessage = ko.observable(ApplicantViewModel.getVisaTokenMessage(applicantService.visaTokenLastUpdated));
+    nationalId = ko.observable(applicantService.nationalId);
+    visaToken = ko.observable(applicantService.visaToken);
     firstName = ko.observable(applicantService.firstName);
     lastName = ko.observable(applicantService.lastName);
     sex = ko.observable(applicantService.sex);
@@ -23,6 +29,7 @@ export class ApplicantViewModel {
     phoneNumber = ko.observable(applicantService.phoneNumber);
     emailId = ko.observable(applicantService.emailId);
     autoSchedule = ko.observable(false);
+    displayExtraFields = ko.observable(ApplicantViewModel.getIsVisaTokenRequired(applicantService.dateOfBirth));
 
     buttonText = ko.computed(() => {
         if (!this.urn()) {
@@ -39,10 +46,20 @@ export class ApplicantViewModel {
     constructor(workerClient: ReservationWorkerClient) {
         this.workerClient = workerClient;
 
+        this.nationalId.subscribe(nationalId => applicantService.nationalId = nationalId);
+        this.visaToken.subscribe(visaToken => applicantService.visaToken = visaToken);
         this.firstName.subscribe(firstName => applicantService.firstName = firstName);
         this.lastName.subscribe(lastName => applicantService.lastName = lastName);
         this.sex.subscribe(sex => applicantService.sex = sex);
-        this.dateOfBirth.subscribe(dateOfBirth => applicantService.dateOfBirth = dateOfBirth);
+        this.dateOfBirth.subscribe(dateOfBirth => {
+            applicantService.dateOfBirth = dateOfBirth;
+            const isVisaTokenRequired = ApplicantViewModel.getIsVisaTokenRequired(dateOfBirth);
+            this.displayExtraFields(isVisaTokenRequired);
+            if(!isVisaTokenRequired){
+                this.nationalId(null);
+                this.visaToken(null);
+            }
+        });
         this.passportNumber.subscribe(passportNumber => applicantService.passportNumber = passportNumber);
         this.passportExpiry.subscribe(passportExpiry => applicantService.passportExpiry = passportExpiry);
         this.phoneCode.subscribe(phoneCode => applicantService.phoneCode = phoneCode);
@@ -77,6 +94,29 @@ export class ApplicantViewModel {
         this.workerClient.observables.scheduleUpdated.subscribe(data => {
             this.message(getScheduleMessage(data));
         });
+
+        setInterval(
+            () => this.visaTokenMessage(ApplicantViewModel.getVisaTokenMessage(applicantService.visaTokenLastUpdated))
+            , 1000);
+    }
+
+    static getVisaTokenMessage(visaTokenLastUpdated: Date) {
+        if (visaTokenLastUpdated) {
+            const visaTokenLastUpdatedMoment = moment(visaTokenLastUpdated);
+            const nowMoment = moment(new Date());
+            if (nowMoment.diff(visaTokenLastUpdatedMoment, 'minutes') < 60) {
+                const ago = visaTokenLastUpdatedMoment.fromNow();
+                return getInfoHtml(`Токен обновлен ${ago}.`);
+            }
+        }
+        return getErrorHtml('Токен устарел!');
+    }
+
+    static getIsVisaTokenRequired(dateOfBirth: string) {
+        const dob = moment(dateOfBirth, 'dd/MM/YYYY');
+        const now = moment(new Date());
+        const years = now.diff(dob, 'years');
+        return 18 <= years && years < 60;
     }
 
     async createApplicant() {
@@ -94,7 +134,9 @@ export class ApplicantViewModel {
                 emailId: this.emailId(),
                 centerCode: visaCenterService.selectedCenter,
                 visaCategoryCode: visaCenterService.selectedVisaSubCategory,
-                ipAddress
+                ipAddress,
+                nationalId: this.nationalId(),
+                visaToken: this.visaToken(),
             });
             const data = await response.json() as createApplicantResponse;
             applicantService.urn = data.urn;

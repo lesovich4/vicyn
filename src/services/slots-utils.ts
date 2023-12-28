@@ -10,7 +10,7 @@ function getNextFriday() {
 
 function getNextDayOfWeekDate(dayOfWeek: number) {
     const date = new Date();
-    date.setDate(date.getDate() + (dayOfWeek + 7 - date.getDay()) % 7);
+    date.setDate(date.getDate() + dayOfWeek + 7 - date.getDay());
     return date;
 }
 
@@ -43,22 +43,19 @@ function getRestMonthRange(date: Date) {
 
 export function getRanges() {
     const today = new Date();
-    const nextMonday = getNextMonday();
-    if (nextMonday.getMonth() !== today.getMonth()) {
-        return [
-            getFullMonthRange(nextMonday),
-        ]
+    const tommorow = new Date(today);
+    tommorow.setDate(tommorow.getDate() + 1);
+
+    const ranges = []
+
+    if (tommorow.getMonth() === today.getMonth()) {
+        ranges.push(getRestMonthRange(today));
     }
 
     const nextFriday = getNextFriday();
     if (nextFriday.getMonth() !== today.getMonth()) {
-        return [
-            getRestMonthRange(today),
-            getFullMonthRange(nextFriday),
-        ]
+        ranges.push(getFullMonthRange(nextFriday));
     }
-
-    return [
-        getRestMonthRange(today),
-    ]
+    
+    return ranges;
 }

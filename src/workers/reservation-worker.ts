@@ -48,7 +48,9 @@ class Sheduler {
                 emailId: applicantService.emailId,
                 centerCode: visaCenterService.selectedCenter,
                 visaCategoryCode: visaCenterService.selectedVisaSubCategory,
-                ipAddress
+                ipAddress,
+                nationalId: applicantService.nationalId,
+                visaToken: applicantService.visaToken,
             });
             const data = await response.json() as createApplicantResponse;
             applicantService.urn = data.urn;
