@@ -9,7 +9,8 @@ import { createApplicant, createApplicantResponse } from "../api/create-applican
 import { getSlots, getSlotsResponse } from "../api/get-slots";
 import { schedule, scheduleResponse } from "../api/schedule";
 import { CountDown } from "../utils/count-down";
- 
+import { getRanges } from "../services/slots-utils";
+
 let _cache: CacheObj = {};
 let _source: CacheSource = {
     set: (cache: CacheObj) => {
@@ -61,28 +62,38 @@ class Sheduler {
 
     async getSlots() {
         try {
-            const response = await getSlots({
-                centerCode: visaCenterService.selectedCenter,
-                visaCategoryCode: visaCenterService.selectedVisaSubCategory
-            });
-            const data = await response.json() as getSlotsResponse[];
 
+            const ranges = getRanges();
             const allocations: allocation[] = [];
-            data.forEach(item => {
-                if (!item.counters) {
-                    return;
-                }
-                item.counters.forEach(counter => {
-                    counter.groups.forEach(group => {
-                        group.timeSlots.forEach(timeSlot => {
-                            allocations.push({
-                                id: timeSlot.allocationId,
-                                text: `${item.date} - ${timeSlot.timeSlot}`,
+
+            for (let i = 0; i < ranges.length; i++) {
+                const { fromDate, toDate } = ranges[i];
+                const response = await getSlots({
+                    centerCode: visaCenterService.selectedCenter,
+                    visaCategoryCode: visaCenterService.selectedVisaSubCategory,
+                    fromDate,
+                    toDate,
+                });
+                const data = await response.json() as getSlotsResponse[];
+
+                data.forEach(item => {
+                    if (!item.counters) {
+                        return;
+                    }
+                    item.counters.forEach(counter => {
+                        counter.groups.forEach(group => {
+                            group.timeSlots.forEach(timeSlot => {
+                                allocations.push({
+                                    id: timeSlot.allocationId,
+                                    text: `${item.date} - ${timeSlot.timeSlot}`,
+                                });
                             });
                         });
                     });
                 });
-            });
+
+                reply('getSlotsUpdated', data);
+            }
             if (allocations.length > 0) {
                 const allocation = allocations[Math.floor(Math.random() * allocations.length)];
                 applicantService.allocation = allocation;
@@ -92,7 +103,6 @@ class Sheduler {
                 reply('allocationUpdated', null);
             }
 
-            reply('getSlotsUpdated', data);
         }
         catch {
             reply('allocationUpdated', null);
@@ -212,7 +222,7 @@ const methods = {
     disableScheduler() {
         scheduler.enabled = false;
     },
-    
+
     schedule() {
         scheduler.process();
     },

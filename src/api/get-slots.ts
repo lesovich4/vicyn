@@ -8,6 +8,8 @@ import { error } from './models/error';
 export interface getSlotsRequest {
     centerCode: string;
     visaCategoryCode: string;
+    fromDate: Date;
+    toDate: Date;
 }
 export interface timeSlot {
     allocationId: number;
@@ -37,7 +39,7 @@ export interface getSlotsResponse {
 }
 
 export async function getSlots(request: getSlotsRequest) {
-    const { centerCode, visaCategoryCode } = request;
+    const { centerCode, visaCategoryCode, fromDate, toDate } = request;
     const query = new URLSearchParams();
     query.append('countryCode', 'blr');
     query.append('missionCode', 'pol');
@@ -47,14 +49,9 @@ export async function getSlots(request: getSlotsRequest) {
     query.append('languageCode', 'ru-RU');
     query.append('applicantsCount', '1');
     query.append('days', '180');
-    const now = new Date();
-    const tomorrow = new Date()
-    tomorrow.setDate(now.getDate() + 1);
-    const monthEnd = new Date();
-    monthEnd.setMonth(now.getMonth() + 1);
-    query.append('fromDate', formatDateDDMMYYYY(tomorrow));
+    query.append('fromDate', formatDateDDMMYYYY(fromDate));
     query.append('slotType', '2');
-    query.append('toDate', formatDateDDMMYYYY(monthEnd));
+    query.append('toDate', formatDateDDMMYYYY(toDate));
     query.append('urn', applicantService.urn);
     query.append('payCode', '');
     const headers = {

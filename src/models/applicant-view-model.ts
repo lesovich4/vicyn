@@ -7,6 +7,7 @@ import { schedule, scheduleResponse } from '../api/schedule';
 import { publicIpv4 } from 'public-ip';
 import { ReservationWorkerClient } from '../workers/reservation-worker-client';
 import { getApplicantMessage, getSlotsMessage, getScheduleMessage } from './applicant-view-model.get-message';
+import { getRanges } from '../services/slots-utils';
 
 export class ApplicantViewModel {
     urn = ko.observable(applicantService.urn);
@@ -109,28 +110,36 @@ export class ApplicantViewModel {
 
     async getSlots() {
         try {
-            const response = await getSlots({
-                centerCode: visaCenterService.selectedCenter,
-                visaCategoryCode: visaCenterService.selectedVisaSubCategory
-            });
-            const data = await response.json() as getSlotsResponse[];
-
             const allocations: allocation[] = [];
-            data.forEach(item => {
-                if (!item.counters) {
-                    return;
-                }
-                item.counters.forEach(counter => {
-                    counter.groups.forEach(group => {
-                        group.timeSlots.forEach(timeSlot => {
-                            allocations.push({
-                                id: timeSlot.allocationId,
-                                text: `${item.date} - ${timeSlot.timeSlot}`,
+            const ranges = getRanges();
+
+            for (let i = 0; i < ranges.length; i++) {
+                const { fromDate, toDate } = ranges[i];
+                const response = await getSlots({
+                    centerCode: visaCenterService.selectedCenter,
+                    visaCategoryCode: visaCenterService.selectedVisaSubCategory,
+                    fromDate,
+                    toDate,
+                });
+                const data = await response.json() as getSlotsResponse[];
+
+                data.forEach(item => {
+                    if (!item.counters) {
+                        return;
+                    }
+                    item.counters.forEach(counter => {
+                        counter.groups.forEach(group => {
+                            group.timeSlots.forEach(timeSlot => {
+                                allocations.push({
+                                    id: timeSlot.allocationId,
+                                    text: `${item.date} - ${timeSlot.timeSlot}`,
+                                });
                             });
                         });
                     });
                 });
-            });
+                this.message(getSlotsMessage(data));
+            }
             if (allocations.length > 0) {
                 const allocation = allocations[Math.floor(Math.random() * allocations.length)];
                 applicantService.allocation = allocation;
@@ -140,7 +149,6 @@ export class ApplicantViewModel {
                 this.removeAllocation();
             }
 
-            this.message(getSlotsMessage(data));
         }
         catch {
             this.removeAllocation();
