@@ -2,6 +2,7 @@
 import { applicantService } from '../services/appicant-service';
 import { authenticationService } from '../services/authentication-service';
 import { formatDateDDMMYYYY } from '../utils/date-time';
+import { makeUniqueQueryParameterName, makeUniqueQueryParameterValue } from '../utils/random-string';
 import { baseUrl } from './base-url';
 import { error } from './models/error';
 
@@ -54,6 +55,8 @@ export async function getSlots(request: getSlotsRequest) {
     query.append('toDate', formatDateDDMMYYYY(toDate));
     query.append('urn', applicantService.urn);
     query.append('payCode', '');
+    query.append(makeUniqueQueryParameterName(1), makeUniqueQueryParameterValue(3)); // to disable response caching
+
     const headers = {
         'Content-Type': 'application/json;charset=UTF-8',
         'Authorization': authenticationService.accessToken()
