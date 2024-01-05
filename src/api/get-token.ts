@@ -3,6 +3,7 @@ import { baseUrl } from './base-url';
 export interface getTokenRequest {
     username: string;
     encryptedPassword: string;
+    captchaResponse: string;
 }
 
 export interface getTokenResponse {
@@ -13,13 +14,13 @@ export interface getTokenResponse {
 
 export async function getToken(request: getTokenRequest) {
     const body = new URLSearchParams();
-    const { username, encryptedPassword } = request;
+    const { username, encryptedPassword, captchaResponse } = request;
     body.append('username', username);
     body.append('password', encryptedPassword);
     body.append('missioncode', 'pol');
     body.append('countrycode', 'blr');
     body.append('captcha_version', 'v2');
-    body.append('captcha_api_key', '');
+    body.append('captcha_api_key', captchaResponse);
 
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'

@@ -1,3 +1,4 @@
+import { makeUniqueQueryParameterName, makeUniqueQueryParameterValue } from "../utils/random-string";
 import { baseUrl } from "./base-url";
 
 export interface GetVisaSubCategoriesResponse{
@@ -11,7 +12,9 @@ export async function getVisaSubCategories(centerCode: string, categoryCode: str
     const xhr = new XMLHttpRequest();
 
     const method = 'GET';
-    const uri = new URL(`/master/subvisacategory/pol/blr/${centerCode}/${categoryCode}/ru-RU`, baseUrl);
+    const pName = makeUniqueQueryParameterName(2);
+    const pValue = makeUniqueQueryParameterValue(2);
+    const uri = new URL(`/master/subvisacategory/pol/blr/${centerCode}/${categoryCode}/ru-RU?${pName}=${pValue}`, baseUrl);
     const headers = {
         'Route': 'blr/ru/pol'
     };

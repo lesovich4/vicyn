@@ -28,6 +28,7 @@ function getMessage() {
 export class TokenViewModel {
     username = ko.observable(authenticationService.username());
     password = ko.observable(authenticationService.password());
+    captchaResponse = ko.observable(authenticationService.captchaResponse());
     enablePulling = ko.observable(false);
     isAuthenticated = ko.observable(authenticationService.isAuthenticated());
     accessToken = ko.observable(authenticationService.accessToken());
@@ -50,6 +51,7 @@ export class TokenViewModel {
             authenticationService.passwordEncrypted(passwordEncrypted);
 
         });
+        this.captchaResponse.subscribe(authenticationService.captchaResponse);
         this.enablePulling.subscribe(value => {
             if (value) {
                 this.workerClient.startPullingTokens();
@@ -63,7 +65,8 @@ export class TokenViewModel {
     getToken() {
         const username = this.username();
         const encryptedPassword = encryptPassword(this.password());
-        getToken({ encryptedPassword, username })
+        const captchaResponse = this.captchaResponse();
+        getToken({ encryptedPassword, username, captchaResponse })
             .then(response => response.json() as Promise<getTokenResponse>)
             .then(token => {
                 this.updateState(token, true);

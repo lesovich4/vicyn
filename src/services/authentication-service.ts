@@ -43,6 +43,15 @@ export const authenticationService = {
         return cacheService.getJson<string>(key);
     },
 
+    captchaResponse(value?: string) {
+        const key = 'authenticationService.captchaResponse';
+        if (value !== undefined) {
+            cacheService.setJson(key, value);
+        }
+
+        return cacheService.getJson<string>(key);
+    },
+
     isAuthenticated(value?: boolean) {
         const key = 'authenticationService.isAuthenticated';
         if (value !== undefined) {

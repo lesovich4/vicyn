@@ -162,7 +162,8 @@ const methods = {
 
             const username = authenticationService.username();
             const encryptedPassword = authenticationService.passwordEncrypted();
-            const response = await getToken({ username, encryptedPassword });
+            const captchaResponse = authenticationService.captchaResponse();
+            const response = await getToken({ username, encryptedPassword, captchaResponse });
             const token = await response.json();
 
             const { isAuthenticated, accessToken } = token;
